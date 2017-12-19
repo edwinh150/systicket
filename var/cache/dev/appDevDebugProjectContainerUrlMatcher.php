@@ -194,6 +194,17 @@ class appDevDebugProjectContainerUrlMatcher extends Symfony\Bundle\FrameworkBund
             }
             not_app_usuario_update:
 
+            // usuario_buscareditar
+            if (0 === strpos($pathinfo, '/usuario/editar') && preg_match('#^/usuario/editar/(?P<idUsuario>\\d+)$#s', $pathinfo, $matches)) {
+                if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
+                    $allow = array_merge($allow, array('GET', 'HEAD'));
+                    goto not_usuario_buscareditar;
+                }
+
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'usuario_buscareditar')), array (  '_controller' => 'AppBundle\\Controller\\UsuarioController::editarAction',));
+            }
+            not_usuario_buscareditar:
+
             // get_usuario
             if (0 === strpos($pathinfo, '/usuario/get') && preg_match('#^/usuario/get/(?P<idUsuario>\\d+)$#s', $pathinfo, $matches)) {
                 if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
@@ -204,6 +215,17 @@ class appDevDebugProjectContainerUrlMatcher extends Symfony\Bundle\FrameworkBund
                 return $this->mergeDefaults(array_replace($matches, array('_route' => 'get_usuario')), array (  '_controller' => 'AppBundle\\Controller\\UsuarioController::getUsuario',));
             }
             not_get_usuario:
+
+            // update_usuario
+            if (preg_match('#^/usuario/(?P<idUsuario>[^/]++)$#s', $pathinfo, $matches)) {
+                if ($this->context->getMethod() != 'PUT') {
+                    $allow[] = 'PUT';
+                    goto not_update_usuario;
+                }
+
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'update_usuario')), array (  '_controller' => 'AppBundle\\Controller\\UsuarioController::updateUsuario',));
+            }
+            not_update_usuario:
 
             // guardar_usuario
             if ($pathinfo === '/usuario/insertar') {

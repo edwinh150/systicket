@@ -93,6 +93,18 @@ class UsuarioController extends Controller
     }
 
     /**
+     * @Route("usuario/editar/{idUsuario}", name="usuario_buscareditar", requirements={"idUsuario"="\d+"} )
+     * @Method("GET")
+     * @param Request $request
+     * @param Usuario $user
+     * @return JsonResponse
+     * */
+    public function editarAction(Request $request, Usuario $user)
+    {
+        return $this->render('BlogBundle:Usuario:edit_user.html.twig', array('usuario' =>$usuario));
+    }
+
+    /**
      * @Route("usuario/get/{idUsuario}", name="get_usuario", requirements={"idUsuario"="\d+"} )
      * @Method("GET")
      * @param Request $request
@@ -103,6 +115,35 @@ class UsuarioController extends Controller
     {
         $userJ = json_decode($this->get('serializer')->serialize($user, 'json'), true);
         return new JsonResponse($userJ);
+    }
+
+    /**
+    * @Route("usuario/{idUsuario}", name="update_usuario", options={"expose"=true})
+    * @param Request $request
+    * @Method({"PUT"})
+    * @return JsonResponse
+    * */
+    public function updateUsuario(Request $request, Usuario $usuario){
+
+        $data = json_decode($request->getContent(), true);
+
+        $form = $this->createForm(UsuarioType::class, $usuario);
+        $usuario->setFechaRegistro(New \DateTime());
+        $form->submit($data);
+
+        if ($form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            //$em->persist($usuario);
+            $em->flush();
+        }else{
+            foreach ($form->getErrors() as $error) {
+                $error[] = $error->getMessage();
+            }
+        }
+
+        $newUser = json_decode($this->get('serializer')->serialize($usuario,'json'), true);
+
+        return new JsonResponse($newUser);
     }
 
     /**
